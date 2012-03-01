@@ -4,10 +4,6 @@ versions = %w[0.1 0.2 0.3]
 def package(version) "out/dpkg-learn_#{version}_all.deb" end
 def package_files(version) "tmp/package-#{version}" end
 
-def files_in(directory)
-  Dir.glob("#{directory}/**/*")
-end
-
 task :default => :run
 task :run => versions.map { |v| package(v) } do
   rm_rf 'tmp/log'
@@ -22,11 +18,16 @@ task :run => versions.map { |v| package(v) } do
 end
 
 versions.each do |version|
-  file package(version) => ['out', 'tmp', *files_in('src')] do
+  file package(version) => ['out', 'tmp', 'src/control'] do
     root = package_files(version)
     recreate root
-    cp_r 'src/.', root
+    mkdir_p "#{root}/DEBIAN"
+    cp 'src/control', "#{root}/DEBIAN/control"
     substitute "#{root}/DEBIAN/control", binding
+    %w[preinst postinst prerm postrm].each do |script|
+      File.open("#{root}/DEBIAN/#{script}", 'w') { |f| f.write(script_content) }
+      chmod 0755, "#{root}/DEBIAN/#{script}"
+    end
     sh "dpkg-deb --build #{root} out"
   end
 end
@@ -47,6 +48,13 @@ end
 def substitute(file, binding)
   content = ERB.new(File.read(file)).result(binding)
   File.open(file, 'w') { |f| f.write(content) }
+end
+
+def script_content
+  <<SCRIPT
+#!/bin/sh -eu
+echo $0 $* >>tmp/log
+SCRIPT
 end
 
 def recreate(dir)
