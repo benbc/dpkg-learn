@@ -1,2 +1,2 @@
 #!/bin/sh -eu
-echo prerm $*
+echo prerm $* >>tmp/dpkg-learn

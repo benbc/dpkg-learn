@@ -1,5 +1,6 @@
 require 'erb'
 
+versions = %w[0.1 0.2 0.3]
 def package(version) "out/dpkg-learn_#{version}_all.deb" end
 def package_files(version) "tmp/package-#{version}" end
 
@@ -8,13 +9,19 @@ def files_in(directory)
 end
 
 task :default => :run
-task :run => [package('0.1'), package('0.2')] do
+task :run => versions.map { |v| package(v) } do
+  rm_rf 'tmp/dpkg-learn'
+  sh "sudo dpkg --purge dpkg-learn"
   sh "sudo dpkg --install #{package('0.1')}"
-  sh "sudo dpkg --install #{package('0.2')}"
   sh "sudo dpkg --remove dpkg-learn"
+  sh "sudo dpkg --install #{package('0.2')}"
+  sh "sudo dpkg --install #{package('0.3')}"
+  sh "sudo dpkg --remove dpkg-learn"
+  sh "sudo dpkg --purge dpkg-learn"
+  sh "cat tmp/dpkg-learn"
 end
 
-['0.1', '0.2'].each do |version|
+versions.each do |version|
   file package(version) => ['out', 'tmp', *files_in('src')] do
     root = package_files(version)
     recreate root
