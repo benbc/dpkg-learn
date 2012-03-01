@@ -57,10 +57,14 @@ def write(file, content)
 end
 
 def script_content
-  <<SCRIPT
+  <<EOF
 #!/bin/sh -eu
-echo "  $0 $*" >>tmp/log
-SCRIPT
+
+script=`basename $0`
+script=${script#dpkg-learn.}
+
+echo "  $script $*" >>tmp/log
+EOF
 end
 
 def recreate(dir)
