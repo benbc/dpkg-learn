@@ -1,27 +1,27 @@
 require 'erb'
 
-def version() '0.1' end
-package = "out/dpkg-learn_#{version}_all.deb"
-package_files = 'tmp/package'
+def package(version) "out/dpkg-learn_#{version}_all.deb" end
+def package_files(version) "tmp/package-#{version}" end
 
 def files_in(directory)
   Dir.glob("#{directory}/**/*")
 end
 
 task :default => :run
-task :run => package do
-  sh "sudo dpkg --install #{package}"
+task :run => [package('0.1'), package('0.2')] do
+  sh "sudo dpkg --install #{package('0.1')}"
+  sh "sudo dpkg --install #{package('0.2')}"
   sh "sudo dpkg --remove dpkg-learn"
 end
 
-file package => ['out', package_files] do
-  sh "dpkg-deb --build #{package_files} out"
-end
-
-file package_files => ['tmp', *files_in('src')] do
-  recreate package_files
-  cp_r 'src/.', "#{package_files}"
-  substitute "#{package_files}/DEBIAN/control"
+['0.1', '0.2'].each do |version|
+  file package(version) => ['out', 'tmp', *files_in('src')] do
+    root = package_files(version)
+    recreate root
+    cp_r 'src/.', root
+    substitute "#{root}/DEBIAN/control", binding
+    sh "dpkg-deb --build #{root} out"
+  end
 end
 
 task :clean do
@@ -32,7 +32,7 @@ end
 directory 'out'
 directory 'tmp'
 
-def substitute(file)
+def substitute(file, binding)
   content = ERB.new(File.read(file)).result(binding)
   File.open(file, 'w') { |f| f.write(content) }
 end
