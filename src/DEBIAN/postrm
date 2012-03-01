@@ -1,2 +1,2 @@
 #!/bin/sh -eu
-echo postrm $* >>tmp/dpkg-learn
+echo postrm $* >>tmp/log

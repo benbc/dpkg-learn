@@ -10,7 +10,7 @@ end
 
 task :default => :run
 task :run => versions.map { |v| package(v) } do
-  rm_rf 'tmp/dpkg-learn'
+  rm_rf 'tmp/log'
   dpkg "purge dpkg-learn"
   dpkg "install #{package('0.1')}"
   dpkg "remove dpkg-learn"
@@ -18,7 +18,7 @@ task :run => versions.map { |v| package(v) } do
   dpkg "install #{package('0.3')}"
   dpkg "remove dpkg-learn"
   dpkg "purge dpkg-learn"
-  sh "cat tmp/dpkg-learn"
+  sh "cat tmp/log"
 end
 
 versions.each do |version|
@@ -40,7 +40,7 @@ directory 'out'
 directory 'tmp'
 
 def dpkg(command)
-  sh "echo #{command} >>tmp/dpkg-learn"
+  sh "echo #{command} >>tmp/log"
   sh "sudo dpkg --#{command}"
 end
 

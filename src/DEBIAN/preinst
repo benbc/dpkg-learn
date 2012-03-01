@@ -1,2 +1,2 @@
 #!/bin/sh -eu
-echo preinst $* >>tmp/dpkg-learn
+echo preinst $* >>tmp/log

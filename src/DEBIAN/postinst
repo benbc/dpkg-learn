@@ -1,2 +1,2 @@
 #!/bin/sh -eu
-echo postinst $* >>tmp/dpkg-learn
+echo postinst $* >>tmp/log
