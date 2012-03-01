@@ -1,12 +1,13 @@
 require 'erb'
 
+def log() 'tmp/log' end
 versions = %w[0.1 0.2 0.3]
 def package(version) "out/dpkg-learn_#{version}_all.deb" end
 def package_files(version) "tmp/package-#{version}" end
 
 task :default => :run
 task :run => versions.map { |v| package(v) } do
-  rm_rf 'tmp/log'
+  rm_rf log
   dpkg "purge dpkg-learn"
   dpkg "install #{package('0.1')}"
   dpkg "remove dpkg-learn"
@@ -14,7 +15,7 @@ task :run => versions.map { |v| package(v) } do
   dpkg "install #{package('0.3')}"
   dpkg "remove dpkg-learn"
   dpkg "purge dpkg-learn"
-  sh "cat tmp/log"
+  sh "cat #{log}"
 end
 
 versions.each do |version|
@@ -43,7 +44,7 @@ directory 'out'
 directory 'tmp'
 
 def dpkg(command)
-  sh "echo #{command} >>tmp/log"
+  sh "echo #{command} >>#{log}"
   sh "sudo dpkg --#{command}"
 end
 
@@ -63,7 +64,7 @@ def script_content
 script=`basename $0`
 script=${script#dpkg-learn.}
 
-echo "  $script $*" >>tmp/log
+echo "  $script $*" >>#{log}
 EOF
 end
 
