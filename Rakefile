@@ -59,7 +59,7 @@ end
 def script_content
   <<SCRIPT
 #!/bin/sh -eu
-echo $0 $* >>tmp/log
+echo "  $0 $*" >>tmp/log
 SCRIPT
 end
 
