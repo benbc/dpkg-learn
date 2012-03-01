@@ -21,12 +21,14 @@ versions.each do |version|
   file package(version) => ['out', 'tmp', 'src/control'] do
     root = package_files(version)
     recreate root
-    mkdir_p "#{root}/DEBIAN"
-    cp 'src/control', "#{root}/DEBIAN/control"
-    substitute "#{root}/DEBIAN/control", binding
+    control_files = "#{root}/DEBIAN"
+    mkdir control_files
+    cp 'src/control', "#{control_files}/control"
+    substitute "#{control_files}/control", binding
     %w[preinst postinst prerm postrm].each do |script|
-      File.open("#{root}/DEBIAN/#{script}", 'w') { |f| f.write(script_content) }
-      chmod 0755, "#{root}/DEBIAN/#{script}"
+      file = "#{control_files}/#{script}"
+      write(file, script_content)
+      chmod 0755, file
     end
     sh "dpkg-deb --build #{root} out"
   end
@@ -47,6 +49,10 @@ end
 
 def substitute(file, binding)
   content = ERB.new(File.read(file)).result(binding)
+  write(file, content)
+end
+
+def write(file, content)
   File.open(file, 'w') { |f| f.write(content) }
 end
 
