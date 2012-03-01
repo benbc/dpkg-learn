@@ -9,7 +9,10 @@ def files_in(directory)
 end
 
 task :default => :run
-task :run => package
+task :run => package do
+  sh "sudo dpkg --install #{package}"
+  sh "sudo dpkg --remove dpkg-learn"
+end
 
 file package => ['out', package_files] do
   sh "dpkg-deb --build #{package_files} out"
@@ -38,4 +41,3 @@ def recreate(dir)
   rm_rf dir
   mkdir_p dir
 end
-
