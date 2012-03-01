@@ -1,0 +1,7 @@
+Package: dpkg-learn
+Version: 0.1
+Architecture: all
+Maintainer: Ben Butler-Cole <ben@bridesmere.com>
+Description: Demo package to help learning about the Debian packaging system.
+Section: misc
+Priority: extra
