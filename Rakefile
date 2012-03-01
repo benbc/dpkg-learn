@@ -11,13 +11,13 @@ end
 task :default => :run
 task :run => versions.map { |v| package(v) } do
   rm_rf 'tmp/dpkg-learn'
-  sh "sudo dpkg --purge dpkg-learn"
-  sh "sudo dpkg --install #{package('0.1')}"
-  sh "sudo dpkg --remove dpkg-learn"
-  sh "sudo dpkg --install #{package('0.2')}"
-  sh "sudo dpkg --install #{package('0.3')}"
-  sh "sudo dpkg --remove dpkg-learn"
-  sh "sudo dpkg --purge dpkg-learn"
+  dpkg "purge dpkg-learn"
+  dpkg "install #{package('0.1')}"
+  dpkg "remove dpkg-learn"
+  dpkg "install #{package('0.2')}"
+  dpkg "install #{package('0.3')}"
+  dpkg "remove dpkg-learn"
+  dpkg "purge dpkg-learn"
   sh "cat tmp/dpkg-learn"
 end
 
@@ -38,6 +38,11 @@ end
 
 directory 'out'
 directory 'tmp'
+
+def dpkg(command)
+  sh "echo #{command} >>tmp/dpkg-learn"
+  sh "sudo dpkg --#{command}"
+end
 
 def substitute(file, binding)
   content = ERB.new(File.read(file)).result(binding)
