@@ -15,6 +15,7 @@ task :run => versions.map { |v| package(v) } do
   dpkg "remove dpkg-learn"
   dpkg "purge dpkg-learn"
   dpkg "install #{package('0.1')}"
+  dpkg "install #{package('0.1')}"
   dpkg "remove dpkg-learn"
   dpkg "install #{package('0.2')}"
   dpkg "install #{package('0.3')}"
