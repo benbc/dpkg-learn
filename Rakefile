@@ -10,10 +10,14 @@ task :run => versions.map { |v| package(v) } do
   rm_rf log
   dpkg "purge dpkg-learn"
   dpkg "install #{package('0.1')}"
+  dpkg "purge dpkg-learn"
+  dpkg "install #{package('0.1')}"
+  dpkg "remove dpkg-learn"
+  dpkg "purge dpkg-learn"
+  dpkg "install #{package('0.1')}"
   dpkg "remove dpkg-learn"
   dpkg "install #{package('0.2')}"
   dpkg "install #{package('0.3')}"
-  dpkg "remove dpkg-learn"
   dpkg "purge dpkg-learn"
   sh "cat #{log}"
 end
