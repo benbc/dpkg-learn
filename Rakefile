@@ -21,14 +21,14 @@ end
 versions.each do |version|
   file package(version) => ['out', 'tmp', 'src/control'] do
     root = package_files(version)
-    recreate root
     control_files = "#{root}/DEBIAN"
-    mkdir control_files
+    rm_rf root
+    mkdir_p control_files
     cp 'src/control', "#{control_files}/control"
     substitute "#{control_files}/control", binding
     %w[preinst postinst prerm postrm].each do |script|
       file = "#{control_files}/#{script}"
-      write(file, script_content)
+      write(file, script_content(version))
       chmod 0755, file
     end
     sh "dpkg-deb --build #{root} out"
@@ -57,18 +57,13 @@ def write(file, content)
   File.open(file, 'w') { |f| f.write(content) }
 end
 
-def script_content
+def script_content(version)
   <<EOF
 #!/bin/sh -eu
 
 script=`basename $0`
 script=${script#dpkg-learn.}
 
-echo "  $script $*" >>#{log}
+echo "  $script-#{version} $*" >>#{log}
 EOF
-end
-
-def recreate(dir)
-  rm_rf dir
-  mkdir_p dir
 end
