@@ -7,7 +7,7 @@ maintainer scripts. It creates an empty package and carries out
 various `dpkg` operations and traces out which maintainer scripts get
 executed with which arguments.
 
-To run the tool execute `rake`.
+To run the tool execute ``rake``.
 
 **Warning** Running this tool will install a package on your
 system. The package is empty and the tool removes it again, but if
