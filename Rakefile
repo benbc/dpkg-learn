@@ -26,8 +26,9 @@ end
 versions.each do |version|
   file package(version) => ['out', 'tmp', 'src/control'] do
     root = package_files(version)
-    control_files = "#{root}/DEBIAN"
     rm_rf root
+
+    control_files = "#{root}/DEBIAN"
     mkdir_p control_files
     cp 'src/control', "#{control_files}/control"
     substitute "#{control_files}/control", binding
@@ -36,6 +37,10 @@ versions.each do |version|
       write(file, script_content(version))
       chmod 0755, file
     end
+
+    mkdir_p "#{root}/usr/share/dpkg-learn"
+    touch "#{root}/usr/share/dpkg-learn/file-#{version}"
+
     sh "dpkg-deb --build #{root} out"
   end
 end
@@ -70,5 +75,15 @@ script=`basename $0`
 script=${script#dpkg-learn.}
 
 echo "  $script-#{version} $*" >>#{log}
+
+if [ ! -e /usr/share/dpkg-learn ]; then
+  files='<missing>'
+else
+  files=`ls /usr/share/dpkg-learn`
+  if [ ! files ]; then
+    files='<empty>'
+  fi
+fi
+echo "$files" | sed 's/^/    /g'  >>#{log}
 EOF
 end
